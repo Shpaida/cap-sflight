@@ -12,6 +12,9 @@ service AnalyticsService @(path:'/analytics') {
     to_Travel.TravelID,
     BookingID,
 
+    @title : 'TEST COUNT'
+    to_Travel.TravelID as countTravelID : String,
+
     @title : 'Travel/Booking ID'
     to_Travel.TravelID || '/' || BookingID as CombinedID : String,
 

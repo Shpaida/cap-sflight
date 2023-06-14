@@ -3,11 +3,13 @@ using AnalyticsService as service from '../../srv/analytics-service';
 annotate service.Bookings with @(
   Aggregation.CustomAggregate #FlightPrice : 'Edm.Decimal',
   Aggregation.CustomAggregate #CurrencyCode_code : 'Edm.String',
+  Aggregation.CustomAggregate #countTravelID : 'Edm.Int32',
   Common.SemanticKey : [ID],
 ) {
   ID                @ID : 'ID';
   FlightPrice       @Aggregation.default: #SUM;
   CurrencyCode_code @Aggregation.default: #MAX;
+  countTravelID     @Aggregation.default: #COUNTDISTINCT;
 };
 
 annotate service.Bookings with @Aggregation.ApplySupported : {
@@ -25,10 +27,18 @@ annotate service.Bookings with @Aggregation.ApplySupported : {
     {Property : status      },
     {Property : FlightPrice },
     {Property : ID          },
-  ],
+    {Property : countTravelID    },
+  ]
 };
 
 annotate service.Bookings with @(
+  Analytics.AggregatedProperty #countTravelID :
+  {
+    Name                 : 'countTravelID',
+    AggregationMethod    : 'countdistinct',
+    AggregatableProperty : countTravelID,
+    @Common.Label        : '{i18n>_countTravelID}'
+  },
   Analytics.AggregatedProperty #countBookings :
   {
     Name                 : 'countBookings',
@@ -91,6 +101,10 @@ annotate service.Bookings with @UI.LineItem : [
     @UI.Importance : #High,
   }, {
     Value          : FlightPrice,
+    @UI.Importance : #High,
+    @HTML5.CssDefaults: {width:'12em'},
+  }, {
+    Value          : countTravelID,
     @UI.Importance : #High,
     @HTML5.CssDefaults: {width:'12em'},
   }, {
